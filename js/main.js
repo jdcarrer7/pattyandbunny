@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initMenuBuilder();
     initMenuBuilder2();
     initHeroScroll();
+    initCommercialSection();
+    initPanelNavigation();
+    initMenuParallax();
 });
 
 /* ========================================
@@ -388,4 +391,131 @@ function updateToppingImages() {
         // Rule 2: Default - only bottom bun
         bottomBunImg.style.top = 'calc(50% - 60px)';    // 60px = 60px above center (toward patty)
     }
+}
+
+/* ========================================
+   COMMERCIAL SECTION
+   ======================================== */
+
+function initCommercialSection() {
+    var section = document.querySelector('.commercial-section');
+    var video = document.querySelector('.commercial-video');
+    var image = document.querySelector('.commercial-image');
+
+    if (!section || !video || !image) return;
+
+    var hasPlayed = false;
+    var isOutOfView = true;
+    var videoEnded = false;
+
+    // When video ends, show image instantly
+    video.addEventListener('ended', function() {
+        videoEnded = true;
+        image.classList.add('visible');
+    });
+
+    // Create observer for 15% visibility (to start playing)
+    var playObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting && !hasPlayed && isOutOfView === false) {
+                // 15% visible and hasn't played yet this cycle
+                video.currentTime = 0;
+                video.play().catch(function(e) { console.log('Commercial video play error:', e); });
+                hasPlayed = true;
+                videoEnded = false;
+                image.classList.remove('visible');
+            }
+        });
+    }, { threshold: 0.15 });
+
+    // Create observer for 0% visibility (to reset)
+    var resetObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (!entry.isIntersecting) {
+                // Completely out of view - reset for next time
+                isOutOfView = true;
+                hasPlayed = false;
+                video.pause();
+                video.currentTime = 0;
+            } else {
+                // At least partially visible
+                isOutOfView = false;
+            }
+        });
+    }, { threshold: 0 });
+
+    playObserver.observe(section);
+    resetObserver.observe(section);
+
+    // Handle fade out when scrolling past
+    window.addEventListener('scroll', function() {
+        var rect = section.getBoundingClientRect();
+        var viewportHeight = window.innerHeight;
+
+        // Calculate how far the section has scrolled past the top of viewport
+        if (rect.top < 0) {
+            // Section is being scrolled past (top is above viewport)
+            var scrolledPast = Math.abs(rect.top);
+            var sectionHeight = rect.height;
+            // Fade out over the height of the section
+            var fadeProgress = Math.min(scrolledPast / sectionHeight, 1);
+            section.style.opacity = 1 - fadeProgress;
+        } else {
+            // Section is still in view or below
+            section.style.opacity = 1;
+        }
+    });
+}
+
+/* ========================================
+   PANEL NAVIGATION (Toppings/Sauces)
+   ======================================== */
+
+function initPanelNavigation() {
+    var toppingsTable = document.querySelector('.toppings-table');
+    if (!toppingsTable) return;
+
+    var backBtn = toppingsTable.querySelector('.nav-back');
+    var nextBtn = toppingsTable.querySelector('.nav-next');
+    var panelTitle = toppingsTable.querySelector('.panel-title');
+    var toppingsPanel = toppingsTable.querySelector('.toppings-panel');
+    var saucesPanel = toppingsTable.querySelector('.sauces-panel');
+
+    if (!backBtn || !nextBtn || !toppingsPanel || !saucesPanel) return;
+
+    // Next button - go to sauces
+    nextBtn.addEventListener('click', function() {
+        toppingsPanel.classList.remove('active-panel');
+        saucesPanel.classList.add('active-panel');
+        panelTitle.textContent = 'Sauces';
+        backBtn.disabled = false;
+        nextBtn.disabled = true;
+    });
+
+    // Back button - go to toppings
+    backBtn.addEventListener('click', function() {
+        saucesPanel.classList.remove('active-panel');
+        toppingsPanel.classList.add('active-panel');
+        panelTitle.textContent = 'Toppings';
+        backBtn.disabled = true;
+        nextBtn.disabled = false;
+    });
+}
+
+/* ========================================
+   MENU PARALLAX EFFECT
+   ======================================== */
+
+function initMenuParallax() {
+    var menuItems = document.querySelectorAll('.menu-item-row');
+
+    menuItems.forEach(function(item) {
+        item.addEventListener('mouseenter', function() {
+            item.classList.add('parallax-hover');
+        });
+
+        item.addEventListener('mouseleave', function() {
+            item.classList.remove('parallax-hover');
+        });
+    });
 }

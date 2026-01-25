@@ -159,6 +159,36 @@ img {
 
 .menu-item-text {
     max-width: 400px;
+    transition: transform 0.3s ease-out;
+}
+
+.menu-item-row .food-image {
+    transition: transform 0.3s ease-out;
+}
+
+/* Parallax hover effect */
+.menu-item-row.parallax-hover .menu-item-text {
+    transform: translateX(-8px) translateY(-4px);
+}
+
+.menu-item-row.parallax-hover .food-image {
+    transform: translateX(12px) translateY(-8px);
+}
+
+/* Preserve scale transforms on left menu */
+.hero-menu-left .menu-item-row.parallax-hover .menu-item-text {
+    transform: scale(1.5) translateX(-8px) translateY(-4px);
+}
+
+/* Preserve scale transforms on right menu */
+.hero-menu-right .menu-item-row.parallax-hover .menu-item-text {
+    transform: scale(0.75) translateX(8px) translateY(-4px);
+}
+
+.hero-menu-right .menu-item-row.parallax-hover .food-image,
+.hero-menu-right .menu-item-row:first-of-type.parallax-hover .food-image,
+.hero-menu-right .menu-item-row:nth-of-type(2).parallax-hover .food-image {
+    transform: scale(1.125) translateX(-12px) translateY(-8px) !important;
 }
 
 .menu-grid .food-image {
@@ -296,6 +326,47 @@ img {
 
 
 
+/* --- Commercial Section --- */
+.commercial-section {
+    width: 100%;
+    background-color: #fef9f3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.commercial-container {
+    position: relative;
+    width: 100%;
+    max-width: 1920px;
+}
+
+.commercial-video,
+.commercial-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+}
+
+.commercial-video {
+    position: relative;
+    z-index: 1;
+}
+
+.commercial-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.commercial-image.visible {
+    opacity: 1;
+}
+
 /* --- Menu Builder Section --- */
 .menu-builder-section {
     width: 100%;
@@ -304,18 +375,27 @@ img {
     background-color: #fef9f3;
 }
 
+.section-heading {
+    max-width: 800px;
+    margin-left: 240px;
+    margin-top: -100px;
+    margin-bottom: 15px;
+    display: block;
+}
+
 .menu-builder-container {
     display: flex;
     align-items: flex-start;
     max-width: 1400px;
     margin: 0 auto;
+    margin-top: -25px;
     padding: 0 60px;
     gap: 60px;
 }
 
 /* --- Toppings Table --- */
 .toppings-table {
-    flex: 0 0 35%;
+    flex: 0 0 50%;
     background-color: #fff;
     border-radius: 16px;
     padding: 40px;
@@ -331,8 +411,8 @@ img {
 }
 
 .toppings-list {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
 }
 
@@ -359,20 +439,87 @@ img {
     cursor: pointer;
 }
 
+.topping-thumb {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
 .topping-name {
     font-size: 1.1rem;
     font-weight: 500;
     color: #333;
+    white-space: nowrap;
+}
+
+/* --- Panel Navigation --- */
+.panel-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #fef9f3;
+}
+
+.panel-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #c41e3a;
+    margin: 0;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    color: #c41e3a;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    border-radius: 6px;
+}
+
+.nav-btn:hover:not(:disabled) {
+    background-color: #c41e3a;
+    color: #fff;
+}
+
+.nav-btn:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+/* --- Toppings/Sauces Panels --- */
+.toppings-panel,
+.sauces-panel {
+    display: none;
+}
+
+.toppings-panel.active-panel,
+.sauces-panel.active-panel {
+    display: block;
+}
+
+.sauces-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
 }
 
 /* --- Video Stack --- */
 .video-stack-container {
     flex: 1;
     position: relative;
-    height: 600px;
+    height: 1200px;
+    min-width: 800px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    margin-top: -350px;
 }
 
 .topping-video {
