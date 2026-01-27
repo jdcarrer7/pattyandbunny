@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initPanelNavigation2();
     initMenuParallax();
     initMainNavigation();
+    initNavbarColorChange();
+    initSectionFadeOverlay();
 });
 
 /* ========================================
@@ -720,8 +722,13 @@ function initMainNavigation() {
                     }
                     break;
 
-                case 'about':
-                    // Placeholder - does nothing for now
+                case 'contact':
+                    // Scroll to contact section
+                    var contactSection = document.getElementById('contact');
+                    if (contactSection) {
+                        var offsetTop = contactSection.offsetTop;
+                        window.scrollTo({ top: offsetTop, behavior: 'instant' });
+                    }
                     break;
 
                 case 'menu':
@@ -729,5 +736,63 @@ function initMainNavigation() {
                     break;
             }
         });
+    });
+}
+
+/* ========================================
+   NAVBAR COLOR CHANGE
+   ======================================== */
+
+function initNavbarColorChange() {
+    var navbar = document.querySelector('.main-nav');
+    var menuBuilder = document.getElementById('menu-builder');
+
+    if (!navbar || !menuBuilder) return;
+
+    window.addEventListener('scroll', function() {
+        var builderTop = menuBuilder.getBoundingClientRect().top;
+        var navbarHeight = navbar.offsetHeight;
+
+        // When navbar touches the builder section
+        if (builderTop <= navbarHeight) {
+            navbar.classList.add('nav-red');
+        } else {
+            navbar.classList.remove('nav-red');
+        }
+    });
+}
+
+/* ========================================
+   SECTION FADE OVERLAY
+   ======================================== */
+
+function initSectionFadeOverlay() {
+    var fadeOverlay = document.querySelector('.section-fade-overlay');
+    var contactSection = document.getElementById('contact');
+
+    if (!fadeOverlay || !contactSection) return;
+
+    window.addEventListener('scroll', function() {
+        var viewportHeight = window.innerHeight;
+        var contactRect = contactSection.getBoundingClientRect();
+
+        // Calculate how much of contact section is in viewport
+        // Start fading when contact is 25% visible (75% of viewport height from top)
+        var startPoint = viewportHeight * 0.75;
+
+        // Contact section top relative to start point
+        var progress = 0;
+
+        if (contactRect.top < startPoint) {
+            // Calculate progress from 25% visible to fully visible
+            // When contactRect.top = startPoint, progress = 0
+            // When contactRect.top = 0 (fully visible), progress = 1
+            progress = (startPoint - contactRect.top) / startPoint;
+            progress = Math.min(Math.max(progress, 0), 1);
+        }
+
+        // Fade from 0 to 0.75 (75% opacity)
+        var opacity = progress * 0.75;
+        fadeOverlay.style.opacity = opacity;
     });
 }
