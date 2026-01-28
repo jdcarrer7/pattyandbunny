@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initMainNavigation();
     initNavbarColorChange();
     initSectionFadeOverlay();
+    initMobileMenu();
 });
 
 /* ========================================
@@ -54,8 +55,10 @@ function initHeroScroll() {
         var phase3End = viewportHeight * 2.0;
         var phase3Progress = scrollY > phase3Start ? Math.min((scrollY - phase3Start) / (phase3End - phase3Start), 1) : 0;
 
-        // Phase 1: Video shifts up 300px, fades in
-        var videoMoveUp = phase1Progress * 300;
+        // Phase 1: Video shifts up (300px desktop, 215px tablet portrait)
+        var isTabletPortrait = window.innerWidth >= 768 && window.innerWidth <= 990 && window.innerHeight > 500;
+        var videoShiftAmount = isTabletPortrait ? 215 : 300;
+        var videoMoveUp = phase1Progress * videoShiftAmount;
         var headingMoveUp = phase1Progress * 30;
 
         // Video fades in from 0% to 100% over first 50px of shift
@@ -77,23 +80,97 @@ function initHeroScroll() {
 
         // Phase 3: Menu panels sweep in
         if (menuLeft && menuRight) {
-            // Eased progress for smoother animation
-            var easeOut = 1 - Math.pow(1 - phase3Progress, 3);
 
-            // Left menu: from -50% (off-screen left) to 7% (left side of viewport)
-            var leftPosition = -50 + (57 * easeOut); // -50% to 7%
-            menuLeft.style.left = leftPosition + '%';
-            menuLeft.style.opacity = phase3Progress;
+            if (isTabletPortrait) {
+                // TABLET PORTRAIT: Sequential menu animation
+                // Phase 3 (100vh-200vh): Burgers sweep in from left to center
+                // Phase 4 (200vh to 200vh+100px): Burgers hold in center
+                // Phase 5 (200vh+100px to 300vh+100px): Burgers exit right
+                // When 25% of burgers exit done, sides start entering
+                // Phase 6: Sides hold for 100px, then unlock
 
-            // Right menu: from -50% (off-screen right) to 7% (right side of viewport)
-            var rightPosition = -50 + (57 * easeOut); // -50% to 7%
-            menuRight.style.right = rightPosition + '%';
-            menuRight.style.opacity = phase3Progress;
+                var holdDistance = 100; // 100px hold
+                var sweepDistance = viewportHeight; // 100vh for sweep animations
+
+                // Phase 3: Burgers sweep in (100vh to 200vh)
+                var burgersInStart = viewportHeight;
+                var burgersInEnd = viewportHeight * 2;
+                var burgersInProgress = scrollY > burgersInStart ? Math.min((scrollY - burgersInStart) / (burgersInEnd - burgersInStart), 1) : 0;
+
+                // Phase 4: Burgers hold (200vh to 200vh + 100px)
+                var burgersHoldStart = burgersInEnd;
+                var burgersHoldEnd = burgersHoldStart + holdDistance;
+
+                // Phase 5: Burgers exit right (200vh+100px to 300vh+100px)
+                var burgersOutStart = burgersHoldEnd;
+                var burgersOutEnd = burgersOutStart + sweepDistance;
+                var burgersOutProgress = scrollY > burgersOutStart ? Math.min((scrollY - burgersOutStart) / (burgersOutEnd - burgersOutStart), 1) : 0;
+
+                // Sides start entering when 25% of burgers exit is done
+                var sidesInStart = burgersOutStart + (sweepDistance * 0.25);
+                var sidesInEnd = sidesInStart + sweepDistance;
+                var sidesInProgress = scrollY > sidesInStart ? Math.min((scrollY - sidesInStart) / (sidesInEnd - sidesInStart), 1) : 0;
+
+                // Phase 6: Sides hold (after sides fully in, hold for 100px)
+                var sidesHoldStart = sidesInEnd;
+                var sidesHoldEnd = sidesHoldStart + holdDistance;
+
+                // Eased progress for smoother animation
+                var easeIn = 1 - Math.pow(1 - burgersInProgress, 3);
+                var easeOut = 1 - Math.pow(1 - burgersOutProgress, 3);
+                var easeSidesIn = 1 - Math.pow(1 - sidesInProgress, 3);
+
+                // Burgers position: -50% (off left) to 0% (centered, shifted left) to 100% (off right)
+                var burgersCenter = 0; // centered position (shifted left)
+                var sidesCenter = 19; // sides position (150px more to the right, ~19% on tablet)
+                var burgersInPosition = -50 + ((burgersCenter + 50) * easeIn); // -50% to 0%
+                var burgersOutPosition = burgersCenter + (100 * easeOut); // 0% to 100%
+                var finalBurgersPosition = burgersOutProgress > 0 ? burgersOutPosition : burgersInPosition;
+
+                menuLeft.style.left = finalBurgersPosition + '%';
+                menuLeft.style.right = 'auto';
+
+                // Burgers opacity: fade in during sweep in, fade out during sweep out
+                var burgersOpacity = burgersInProgress;
+                if (burgersOutProgress > 0) {
+                    burgersOpacity = 1 - burgersOutProgress;
+                }
+                menuLeft.style.opacity = burgersOpacity;
+
+                // Sides position: -50% (off left) to 25% (centered, 200px right of burgers)
+                var sidesPosition = -50 + ((sidesCenter + 50) * easeSidesIn); // -50% to 25%
+                menuRight.style.left = sidesPosition + '%';
+                menuRight.style.right = 'auto';
+                menuRight.style.opacity = sidesInProgress;
+
+            } else {
+                // DESKTOP/TABLET LANDSCAPE: Original side-by-side animation
+                var easeOut = 1 - Math.pow(1 - phase3Progress, 3);
+
+                // Left menu: from -50% (off-screen left) to 7% (left side of viewport)
+                var leftPosition = -50 + (57 * easeOut); // -50% to 7%
+                menuLeft.style.left = leftPosition + '%';
+                menuLeft.style.opacity = phase3Progress;
+
+                // Right menu: from -50% (off-screen right) to 7% (right side of viewport)
+                var rightPosition = -50 + (57 * easeOut); // -50% to 7%
+                menuRight.style.right = rightPosition + '%';
+                menuRight.style.opacity = phase3Progress;
+            }
         }
 
-        // Overlay opacity: transition from 50% to 75% during phase 3
+        // Overlay opacity: transition from 50% to 75% during menu animation
         if (heroOverlay) {
-            var overlayOpacity = 0.5 + (0.25 * phase3Progress); // 0.5 to 0.75
+            var overlayProgress;
+            if (isTabletPortrait) {
+                // For tablet portrait, use burgers in progress
+                var burgersInStart = viewportHeight;
+                var burgersInEnd = viewportHeight * 2;
+                overlayProgress = scrollY > burgersInStart ? Math.min((scrollY - burgersInStart) / (burgersInEnd - burgersInStart), 1) : 0;
+            } else {
+                overlayProgress = phase3Progress;
+            }
+            var overlayOpacity = 0.5 + (0.25 * overlayProgress); // 0.5 to 0.75
             heroOverlay.style.backgroundColor = 'rgba(0, 0, 0, ' + overlayOpacity + ')';
         }
     });
@@ -184,22 +261,27 @@ function updateToppingVideos() {
     // Rule 1: Handle anchor (patty/cheese combo)
     if (cheeseSelected && pattySelected) {
         cheeseVideo.classList.remove('active');
+        cheeseVideo.pause();
         pattyVideo.classList.remove('active');
+        pattyVideo.pause();
         comboVideo.classList.add('active');
         comboVideo.play().catch(function(e) { console.log('Combo video play error:', e); });
     } else {
         comboVideo.classList.remove('active');
+        comboVideo.pause();
         if (cheeseSelected) {
             cheeseVideo.classList.add('active');
             cheeseVideo.play().catch(function(e) { console.log('Cheese video play error:', e); });
         } else {
             cheeseVideo.classList.remove('active');
+            cheeseVideo.pause();
         }
         if (pattySelected) {
             pattyVideo.classList.add('active');
             pattyVideo.play().catch(function(e) { console.log('Patty video play error:', e); });
         } else {
             pattyVideo.classList.remove('active');
+            pattyVideo.pause();
         }
     }
 
@@ -215,6 +297,7 @@ function updateToppingVideos() {
             video.play().catch(function(e) { console.log('Video play error:', e); });
         } else {
             video.classList.remove('active');
+            video.pause();
         }
     }
 
@@ -693,6 +776,32 @@ function initMenuParallax() {
 function initMainNavigation() {
     var navLinks = document.querySelectorAll('.main-nav a[data-nav]');
     var viewportHeight = window.innerHeight;
+    var navDropdown = document.querySelector('.nav-dropdown');
+    var menuLink = document.querySelector('.nav-link[data-nav="menu"]');
+    var dropdownLinks = document.querySelectorAll('.dropdown-content a');
+
+    // Toggle dropdown on menu click
+    if (menuLink && navDropdown) {
+        menuLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            navDropdown.classList.toggle('active');
+        });
+    }
+
+    // Close dropdown when clicking dropdown options
+    dropdownLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+            navDropdown.classList.remove('active');
+        });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (navDropdown && !navDropdown.contains(e.target)) {
+            navDropdown.classList.remove('active');
+        }
+    });
 
     navLinks.forEach(function(link) {
         link.addEventListener('click', function(e) {
@@ -711,6 +820,8 @@ function initMainNavigation() {
                     // Scroll to hero menu section (where menu panels are fully visible)
                     // This is at approximately 200vh scroll position
                     window.scrollTo({ top: viewportHeight * 2, behavior: 'instant' });
+                    // Close dropdown
+                    if (navDropdown) navDropdown.classList.remove('active');
                     break;
 
                 case 'custom':
@@ -720,6 +831,8 @@ function initMainNavigation() {
                         var offsetTop = menuBuilder.offsetTop;
                         window.scrollTo({ top: offsetTop, behavior: 'instant' });
                     }
+                    // Close dropdown
+                    if (navDropdown) navDropdown.classList.remove('active');
                     break;
 
                 case 'contact':
@@ -732,7 +845,7 @@ function initMainNavigation() {
                     break;
 
                 case 'menu':
-                    // Main menu link - does nothing, dropdown handles navigation
+                    // Main menu link - handled by separate toggle handler
                     break;
             }
         });
@@ -794,5 +907,113 @@ function initSectionFadeOverlay() {
         // Fade from 0 to 0.75 (75% opacity)
         var opacity = progress * 0.75;
         fadeOverlay.style.opacity = opacity;
+    });
+}
+
+/* ========================================
+   MOBILE MENU
+   ======================================== */
+
+function initMobileMenu() {
+    var hamburgerBtn = document.querySelector('.hamburger-btn');
+    var mobileOverlay = document.querySelector('.mobile-menu-overlay');
+    var closeBtn = document.querySelector('.mobile-menu-close');
+    var mobileDropdown = document.querySelector('.mobile-dropdown');
+    var mobileDropdownToggle = document.querySelector('.mobile-dropdown-toggle');
+    var mobileNavLinks = document.querySelectorAll('.mobile-menu-links > a[data-nav]');
+    var mobileDropdownLinks = document.querySelectorAll('.mobile-dropdown-content a');
+    var viewportHeight = window.innerHeight;
+
+    if (!hamburgerBtn || !mobileOverlay || !closeBtn) return;
+
+    // Open menu
+    hamburgerBtn.addEventListener('click', function() {
+        mobileOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+
+    // Close menu with X button
+    closeBtn.addEventListener('click', function() {
+        mobileOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+        // Reset dropdown state
+        if (mobileDropdown) mobileDropdown.classList.remove('active');
+    });
+
+    // Toggle dropdown menu
+    if (mobileDropdownToggle && mobileDropdown) {
+        mobileDropdownToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            mobileDropdown.classList.toggle('active');
+        });
+    }
+
+    // Close menu and navigate when clicking main links (HOME, CONTACT)
+    mobileNavLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var navType = link.getAttribute('data-nav');
+
+            // Close menu
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+            if (mobileDropdown) mobileDropdown.classList.remove('active');
+
+            // Navigate
+            if (navType === 'home') {
+                window.scrollTo({ top: 0, behavior: 'instant' });
+            } else if (navType === 'contact') {
+                var contactSection = document.getElementById('contact');
+                if (contactSection) {
+                    window.scrollTo({ top: contactSection.offsetTop, behavior: 'instant' });
+                }
+            }
+        });
+    });
+
+    // Close menu and navigate when clicking dropdown links
+    mobileDropdownLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var navType = link.getAttribute('data-nav');
+
+            // Close menu
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+            if (mobileDropdown) mobileDropdown.classList.remove('active');
+
+            // Check if tablet portrait mode
+            var isTabletPortrait = window.innerWidth <= 990 && window.innerWidth >= 768 && window.innerHeight > 500;
+
+            // Navigate
+            switch(navType) {
+                case 'burgers':
+                    // Burgers section - same for all viewports
+                    window.scrollTo({ top: viewportHeight * 2, behavior: 'instant' });
+                    break;
+                case 'sides':
+                case 'drinks':
+                    if (isTabletPortrait) {
+                        // In tablet portrait, sides appear after burgers exit
+                        // Sides hold position is around 350vh (after burgers exit + sides sweep in)
+                        var holdDistance = 100;
+                        var sweepDistance = viewportHeight;
+                        var burgersHoldEnd = (viewportHeight * 2) + holdDistance;
+                        var sidesInStart = burgersHoldEnd + (sweepDistance * 0.25);
+                        var sidesHoldStart = sidesInStart + sweepDistance;
+                        window.scrollTo({ top: sidesHoldStart, behavior: 'instant' });
+                    } else {
+                        // Desktop/tablet landscape - sides visible at same position as burgers
+                        window.scrollTo({ top: viewportHeight * 2, behavior: 'instant' });
+                    }
+                    break;
+                case 'custom':
+                    var menuBuilder = document.getElementById('menu-builder');
+                    if (menuBuilder) {
+                        window.scrollTo({ top: menuBuilder.offsetTop, behavior: 'instant' });
+                    }
+                    break;
+            }
+        });
     });
 }

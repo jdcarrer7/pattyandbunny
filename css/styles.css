@@ -15,12 +15,14 @@
 
 html {
     scroll-behavior: smooth;
+    overscroll-behavior-x: none;
 }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     line-height: 1.6;
-    overflow-x: hidden;
+    overflow-x: clip;
+    overscroll-behavior-x: none;
 }
 
 img {
@@ -99,7 +101,16 @@ img {
     margin-top: 10px;
 }
 
-.nav-dropdown:hover .dropdown-content {
+/* Hover only for devices with hover capability (desktop) */
+@media (hover: hover) {
+    .nav-dropdown:hover .dropdown-content {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+/* Active class for touch devices and click toggle */
+.nav-dropdown.active .dropdown-content {
     opacity: 1;
     visibility: visible;
 }
@@ -118,6 +129,133 @@ img {
 .dropdown-content a:hover {
     background-color: rgba(228, 211, 176, 0.15);
     color: #fff;
+}
+
+/* --- Nav Links Container (Desktop) --- */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+/* --- Hamburger Menu (Hidden on Desktop) --- */
+.hamburger-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 101;
+}
+
+.hamburger-line {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: #E4D3B0;
+    margin: 5px 0;
+    border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* --- Mobile Menu Overlay --- */
+.mobile-menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    z-index: 200;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-menu-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mobile-menu-close {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    background: none;
+    border: none;
+    color: #E4D3B0;
+    font-size: 3rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.mobile-menu-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 30px;
+}
+
+.mobile-menu-links > a,
+.mobile-dropdown-toggle {
+    color: #E4D3B0;
+    text-decoration: none;
+    font-size: 1.8rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    transition: color 0.2s ease;
+    display: block;
+}
+
+.mobile-menu-links > a:hover,
+.mobile-dropdown-toggle:hover {
+    color: #fff;
+}
+
+/* Mobile Dropdown */
+.mobile-dropdown {
+    text-align: center;
+}
+
+.mobile-arrow {
+    font-size: 1rem;
+    margin-left: 8px;
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+.mobile-dropdown.active .mobile-arrow {
+    transform: rotate(180deg);
+}
+
+.mobile-dropdown-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.mobile-dropdown.active .mobile-dropdown-content {
+    max-height: 300px;
+}
+
+.mobile-dropdown-content a {
+    color: #E4D3B0;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    display: block;
+    padding: 15px 0;
+    opacity: 0.8;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.mobile-dropdown-content a:hover {
+    color: #fff;
+    opacity: 1;
 }
 
 /* --- Hero Section --- */
@@ -487,6 +625,8 @@ img {
     border-radius: 16px;
     padding: 40px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    position: relative;
+    z-index: 10;
 }
 
 .toppings-title {
@@ -797,14 +937,18 @@ img {
     align-items: flex-start;
     justify-content: center;
     margin-top: -350px;
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .topping-video {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) translateZ(0);
     width: 100%;
+    will-change: opacity;
+    backface-visibility: hidden;
     height: 100%;
     object-fit: contain;
     opacity: 0;
@@ -1283,6 +1427,141 @@ img {
    ======================================== */
 @media screen and (max-width: 1200px) and (min-width: 991px) {
     /* Tablet Landscape specific styles */
+
+    /* Hamburger Menu - Show on tablet */
+    .hamburger-btn {
+        display: block !important;
+    }
+
+    .nav-links {
+        display: none !important;
+    }
+
+    .mobile-menu-overlay {
+        display: block !important;
+    }
+
+    /* Hero Menu - Enlarged by 25% */
+    .hero-menu-left .menu-title {
+        transform: scale(1.06) !important;
+        max-width: 200px !important;
+    }
+
+    .hero-menu-left .menu-subheading {
+        transform: scale(0.81) !important;
+        max-width: 150px !important;
+    }
+
+    .hero-menu-left .menu-item-text {
+        transform: scale(1.06) !important;
+        max-width: 310px !important;
+    }
+
+    .hero-menu-left .food-image-container {
+        margin-left: 75px !important;
+    }
+
+    .hero-menu-left .food-image {
+        margin-left: 0 !important;
+    }
+
+    .hero-menu-left .menu-item-row {
+        gap: 12px !important;
+        margin-top: 0px !important;
+    }
+
+    .menu-grid .food-image {
+        max-width: 115px !important;
+    }
+
+    .hero-menu-right .menu-title {
+        transform: scale(0.63) !important;
+        max-width: 175px !important;
+    }
+
+    .hero-menu-right .menu-item-text {
+        transform: scale(0.5) !important;
+        max-width: 225px !important;
+    }
+
+    /* Fries text - 25% larger */
+    .hero-menu-right .menu-item-row:first-of-type .menu-item-text {
+        transform: scale(0.625) !important;
+    }
+
+    /* Drinks text - 20% larger */
+    .hero-menu-right .menu-item-row:nth-of-type(2) .menu-item-text {
+        transform: scale(0.6) !important;
+    }
+
+    .hero-menu-right .food-image-container {
+        margin-right: -30px !important;
+    }
+
+    .hero-menu-right .menu-item-row {
+        gap: 10px !important;
+    }
+
+    .hero-menu-right .menu-item-row:first-of-type .food-image,
+    .hero-menu-right .menu-item-row:nth-of-type(2) .food-image {
+        transform: scale(1.0) !important;
+    }
+
+    .menu-disclaimer {
+        max-width: 115px !important;
+        margin-left: 100px !important;
+        transform: scale(1.06) !important;
+    }
+
+    /* Hero Menu Section spacing */
+    .hero-menu-content {
+        gap: 25px !important;
+    }
+
+    .hero-menu-left,
+    .hero-menu-right {
+        padding: 20px !important;
+    }
+
+    /* Commercial Section - full width video */
+    .commercial-section {
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .commercial-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .commercial-video {
+        width: 100% !important;
+        height: auto !important;
+        object-fit: cover !important;
+    }
+
+    /* Menu Builder Section */
+    .section-heading {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        display: block !important;
+    }
+
+    /* Method 1 burger - move left */
+    .video-stack-container {
+        margin-left: -175px !important;
+    }
+
+    /* Method 2 burger - move left and increase size */
+    .image-stack-container {
+        margin-left: 10px !important;
+        margin-top: -280px !important;
+        transform: scale(0.78) !important;
+        transform-origin: top center !important;
+    }
 }
 
 /* ========================================
@@ -1290,6 +1569,96 @@ img {
    ======================================== */
 @media screen and (max-width: 990px) and (min-width: 768px) and (min-height: 501px) {
     /* Tablet Portrait specific styles */
+
+    /* Hamburger Menu - Show on tablet */
+    .hamburger-btn {
+        display: block !important;
+    }
+
+    .nav-links {
+        display: none !important;
+    }
+
+    .mobile-menu-overlay {
+        display: block !important;
+    }
+
+    /* Extend hero section for sequential menu animation */
+    .hero-section-wrapper {
+        height: 450vh !important;
+    }
+
+    /* Center menus for portrait display */
+    .hero-menu-left,
+    .hero-menu-right {
+        transform: translateY(-50%) scale(0.85) !important;
+    }
+
+    /* Reset right positioning for portrait (JS controls left position) */
+    .hero-menu-right {
+        right: auto !important;
+    }
+
+    /* Move burger heading 100px to the left */
+    .hero-menu-left .menu-title {
+        margin-left: -100px !important;
+    }
+
+    /* Reduce window padding to expand grid and fit text */
+    .toppings-table,
+    .toppings-table-2 {
+        padding: 10px !important;
+    }
+
+    .topping-item,
+    .topping-item-2 {
+        padding: 12px 10px !important;
+        gap: 10px !important;
+    }
+
+    .topping-name,
+    .topping-name-2 {
+        font-size: 0.9rem !important;
+    }
+
+    /* Move Method 1 and Method 2 burgers 250px to the left */
+    .video-stack-container {
+        margin-left: -250px !important;
+    }
+
+    .image-stack-container {
+        margin-left: 0px !important;
+        margin-top: -410px !important;
+        transform: scale(1.14) !important;
+    }
+
+    /* Center Build Your Burger heading */
+    .section-heading {
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    /* Contact Section - Logo in bottom right corner, pull up to reduce gap */
+    .contact-section {
+        position: relative !important;
+        margin-top: -300px !important;
+    }
+
+    .contact-container {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+
+    .contact-logo {
+        position: absolute !important;
+        bottom: 30px !important;
+        right: 30px !important;
+        flex: none !important;
+    }
+
+    .contact-logo img {
+        max-width: 150px !important;
+    }
 }
 
 /* ========================================

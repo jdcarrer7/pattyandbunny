@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="PATTY & BUN-NY - Build Your Perfect Burger">
     <title>PATTY & BUN-NY</title>
-    <link rel="stylesheet" href="css/styles.css?v=1299">
+    <link rel="stylesheet" href="css/styles.css?v=1373">
 </head>
 <body>
     <!-- ========================================
@@ -13,18 +13,44 @@
          ======================================== -->
     <!-- Navigation Bar -->
     <nav class="main-nav">
-        <a href="#hero" class="nav-link" data-nav="home">HOME</a>
-        <div class="nav-dropdown">
-            <a href="#" class="nav-link" data-nav="menu">MENU <span class="dropdown-arrow">&#9662;</span></a>
-            <div class="dropdown-content">
-                <a href="#hero-menu" data-nav="burgers">Burgers</a>
-                <a href="#hero-menu" data-nav="sides">Sides</a>
-                <a href="#hero-menu" data-nav="drinks">Drinks</a>
-                <a href="#menu-builder" data-nav="custom">Custom</a>
+        <!-- Hamburger Icon (tablet/mobile) -->
+        <button class="hamburger-btn" aria-label="Open menu">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+        <!-- Desktop Nav Links -->
+        <div class="nav-links">
+            <a href="#hero" class="nav-link" data-nav="home">HOME</a>
+            <div class="nav-dropdown">
+                <a href="#" class="nav-link" data-nav="menu">MENU <span class="dropdown-arrow">&#9662;</span></a>
+                <div class="dropdown-content">
+                    <a href="#hero-menu" data-nav="burgers">Burgers</a>
+                    <a href="#hero-menu" data-nav="sides">Sides</a>
+                    <a href="#hero-menu" data-nav="drinks">Drinks</a>
+                    <a href="#menu-builder" data-nav="custom">Custom</a>
+                </div>
             </div>
+            <a href="#contact" class="nav-link" data-nav="contact">CONTACT</a>
         </div>
-        <a href="#contact" class="nav-link" data-nav="contact">CONTACT</a>
     </nav>
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay">
+        <button class="mobile-menu-close" aria-label="Close menu">&times;</button>
+        <div class="mobile-menu-links">
+            <a href="#hero" data-nav="home">HOME</a>
+            <div class="mobile-dropdown">
+                <a href="#" class="mobile-dropdown-toggle">MENU <span class="mobile-arrow">&#9662;</span></a>
+                <div class="mobile-dropdown-content">
+                    <a href="#hero-menu" data-nav="burgers">Burgers</a>
+                    <a href="#hero-menu" data-nav="sides">Sides</a>
+                    <a href="#hero-menu" data-nav="drinks">Drinks</a>
+                    <a href="#menu-builder" data-nav="custom">Custom</a>
+                </div>
+            </div>
+            <a href="#contact" data-nav="contact">CONTACT</a>
+        </div>
+    </div>
 
     <div class="hero-section-wrapper" id="hero">
         <section class="hero-section">
@@ -113,7 +139,8 @@
     <section class="commercial-section">
         <div class="commercial-container">
             <video class="commercial-video" muted playsinline preload="auto">
-                <source src="assets/video/burger commercial2.mp4" type="video/mp4">
+                <source src="assets/video/burger_commercial2_tablet.mp4" type="video/mp4">
+                <source src="assets/video/burger%20commercial2.mp4" type="video/mp4">
             </video>
             <img class="commercial-image" src="assets/image/commercial_2.png" alt="Patty & Bunny Burger Combo">
         </div>
@@ -140,7 +167,7 @@
                     <label class="topping-item" data-topping="top_bun">
                         <input type="checkbox" checked>
                         <img src="assets/image/topping selection /1_bun_selection.png" alt="Bun" class="topping-thumb">
-                        <span class="topping-name">Top Bun</span>
+                        <span class="topping-name">T.Bun</span>
                     </label>
                     <label class="topping-item" data-topping="pickles">
                         <input type="checkbox">
@@ -175,7 +202,7 @@
                     <label class="topping-item" data-topping="bottom_bun">
                         <input type="checkbox" checked>
                         <img src="assets/image/topping selection /1_bun_selection.png" alt="Bun" class="topping-thumb">
-                        <span class="topping-name">Bottom Bun</span>
+                        <span class="topping-name">B.Bun</span>
                     </label>
                 </div>
                 </div>
@@ -352,7 +379,7 @@
                     <label class="topping-item-2" data-topping-2="top_bun">
                         <input type="checkbox" checked>
                         <img src="assets/image/topping selection /1_bun_selection.png" alt="Bun" class="topping-thumb-2">
-                        <span class="topping-name-2">Top Bun</span>
+                        <span class="topping-name-2">T.Bun</span>
                     </label>
                     <label class="topping-item-2" data-topping-2="pickles">
                         <input type="checkbox">
@@ -392,7 +419,7 @@
                     <label class="topping-item-2" data-topping-2="bottom_bun">
                         <input type="checkbox" checked>
                         <img src="assets/image/topping selection /1_bun_selection.png" alt="Bun" class="topping-thumb-2">
-                        <span class="topping-name-2">Bottom Bun</span>
+                        <span class="topping-name-2">B.Bun</span>
                     </label>
                 </div>
                 </div>
@@ -580,6 +607,6 @@
         </div>
     </section>
 
-    <script src="js/main.js?v=1269"></script>
+    <script src="js/main.js?v=1294"></script>
 </body>
 </html>
