@@ -25,3 +25,15 @@ build/
 *.tmp
 *.temp
 .cache/
+
+# Large raw MOV files (not HEVC encoded) - exceed Cloudflare 25MB limit
+assets/video/videos_alpha/1_top_bun.mov
+assets/video/videos_alpha/2_pickles.mov
+assets/video/videos_alpha/3_onion.mov
+assets/video/videos_alpha/4_cheese.mov
+assets/video/videos_alpha/5_patty.mov
+assets/video/videos_alpha/5_1_pattyandcheese.mov
+assets/video/videos_alpha/6_tomato.mov
+assets/video/videos_alpha/7_lettuce.mov
+assets/video/videos_alpha/8_bottom_bun.mov
+assets/video/videos_alpha/top_bun_long.mov
