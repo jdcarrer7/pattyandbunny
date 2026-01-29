@@ -1784,5 +1784,327 @@ img {
    MOBILE PORTRAIT: width ≤ 767px (height > 500px)
    ======================================== */
 @media screen and (max-width: 767px) and (min-height: 501px) {
-    /* Mobile Portrait specific styles */
+    /* Fix horizontal overflow */
+    .hero-section-wrapper,
+    .hero-section,
+    .menu-builder-section,
+    .menu-builder-section-2,
+    .commercial-section,
+    .contact-section {
+        max-width: 100vw !important;
+        overflow-x: clip !important;
+    }
+
+    /* Hamburger Menu - Show on mobile portrait */
+    .hamburger-btn {
+        display: block !important;
+    }
+
+    .nav-links {
+        display: none !important;
+    }
+
+    .mobile-menu-overlay {
+        display: block !important;
+    }
+
+    /* Reduce logo size (smaller than tablet's 112px) */
+    .logo {
+        width: 100px !important;
+    }
+
+    /* Increase hero heading and waving characters by 50% (60% * 1.5 = 90%) */
+    .hero-heading,
+    .hero-video-behind {
+        width: 90% !important;
+    }
+
+    /* Extend hero section for sequential menu animation (upward exit needs more space) */
+    .hero-section-wrapper {
+        height: 500vh !important;
+    }
+
+    /* Scale menus smaller and lower them for mobile portrait */
+    /* Note: top is set without !important so JS can override it for shift-up animation */
+    .hero-menu-left,
+    .hero-menu-right {
+        top: calc(60% + 100px);
+        transform: translateY(-50%) translateX(-45px) scale(0.6) !important;
+    }
+
+    /* Reset right positioning (JS controls left position) */
+    .hero-menu-right {
+        right: auto !important;
+    }
+
+    /* Adjust burger heading margin for smaller viewport */
+    .hero-menu-left .menu-title {
+        margin-left: 40px !important;
+        margin-bottom: 45px !important;
+    }
+
+    /* Add spacing after subheadings (e.g. 50's Classic, New Arrival) */
+    .menu-subheading {
+        margin-top: 45px !important;
+        margin-bottom: 45px !important;
+    }
+
+    /* Stack food images below text instead of side-by-side */
+    .menu-item-row {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 40px !important;
+        margin-bottom: 30px !important;
+    }
+
+    /* Center food image containers */
+    .food-image-container {
+        display: flex !important;
+        justify-content: center !important;
+    }
+
+    /* Add spacing between rows in the grid */
+    .menu-grid {
+        gap: 10px !important;
+    }
+
+    /* Override right menu row-reverse to column, smaller gap for fries/drink */
+    .hero-menu-right .menu-item-row {
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+
+    /* Move sides/drinks menu to the left */
+    .hero-menu-right {
+        transform: translateY(-50%) translateX(-95px) scale(0.6) !important;
+    }
+
+    /* Shift sides heading to the right */
+    .hero-menu-right .menu-title {
+        margin-left: 65px !important;
+    }
+
+    /* Shift fries and soda images to the right */
+    .hero-menu-right .food-image-container {
+        margin-left: 65px !important;
+    }
+
+    /* Put disclaimer below drink image */
+    .hero-menu-right .menu-text-with-disclaimer {
+        display: contents !important;
+    }
+
+    .hero-menu-right .menu-item-text {
+        order: 1 !important;
+    }
+
+    .hero-menu-right .food-image-container {
+        order: 2 !important;
+    }
+
+    .hero-menu-right .menu-disclaimer {
+        order: 3 !important;
+    }
+
+    /* Shift burger images to the right */
+    .hero-menu-left .food-image-container {
+        margin-left: 200px !important;
+    }
+
+    .hero-menu-right .food-image-container {
+        margin-right: 0 !important;
+    }
+
+    /* Adjust disclaimer margin for stacked layout */
+    .menu-disclaimer {
+        margin-left: 0 !important;
+    }
+
+    /* Reduce toppings table padding and font size */
+    .toppings-table,
+    .toppings-table-2 {
+        padding: 10px !important;
+    }
+
+    .topping-item,
+    .topping-item-2 {
+        padding: 10px 8px !important;
+        gap: 8px !important;
+    }
+
+    .topping-name,
+    .topping-name-2 {
+        font-size: 0.85rem !important;
+    }
+
+    /* Reduce and center Build Your Burger heading to fit viewport */
+    .section-heading {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        max-width: calc(100vw - 20px) !important;
+        margin-top: -40px !important;
+        margin-bottom: 10px !important;
+    }
+
+    /* Builder containers: stack vertically, full width */
+    .menu-builder-container,
+    .menu-builder-container-2 {
+        flex-direction: column !important;
+        padding: 0 5px !important;
+        gap: 20px !important;
+        max-width: 100% !important;
+        margin-top: 0 !important;
+        align-items: center !important;
+    }
+
+    /* Builder sections: minimal padding, clip horizontal but allow vertical overflow */
+    .menu-builder-section,
+    .menu-builder-section-2 {
+        padding: 10px 0 !important;
+        overflow-x: clip !important;
+        overflow-y: visible !important;
+    }
+
+    /* Toppings tables: full width, reset negative margins from desktop layout */
+    .toppings-table,
+    .toppings-table-2 {
+        flex: none !important;
+        width: 100% !important;
+        padding: 10px !important;
+        box-sizing: border-box !important;
+        margin-top: 0 !important;
+    }
+
+    /* Method 1 burger: below the table, full width, no overlap */
+    .video-stack-container {
+        flex: none !important;
+        position: relative !important;
+        margin: 0 auto !important;
+        min-width: 0 !important;
+        width: calc(100vw - 10px) !important;
+        height: 400px !important;
+        overflow: visible !important;
+        transition: height 0.4s ease !important;
+    }
+
+    /* Scale up Method 1 burger videos (16:9 landscape videos render small with object-fit:contain) */
+    .topping-video {
+        transform: translate(-50%, -50%) scale(1.7) translateZ(0) !important;
+    }
+
+    /* Method 2 burger: below the table, full width, no overlap */
+    .image-stack-container {
+        flex: none !important;
+        position: relative !important;
+        margin: 0 auto !important;
+        width: calc(100vw - 10px) !important;
+        height: 400px !important;
+        transform: none !important;
+        transform-origin: center center !important;
+        overflow: visible !important;
+        transition: height 0.4s ease !important;
+    }
+
+    /* Scale down Method 2 burger images by 25% */
+    .topping-image {
+        width: 75% !important;
+    }
+
+    /* Contact Section - vertical layout for mobile */
+    .contact-section {
+        position: relative !important;
+        margin-top: 0px !important;
+        min-height: auto !important;
+    }
+
+    .contact-container {
+        flex-direction: column !important;
+        align-items: center !important;
+        padding: 40px 20px !important;
+        gap: 30px !important;
+    }
+
+    .contact-title {
+        font-size: 2rem !important;
+        margin-bottom: 20px !important;
+        text-align: center !important;
+    }
+
+    .locations-dropdown-toggle {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        width: 100% !important;
+        padding: 12px 20px !important;
+        background: rgba(228, 211, 176, 0.1) !important;
+        border: 1px solid rgba(228, 211, 176, 0.3) !important;
+        border-radius: 8px !important;
+        color: #E4D3B0 !important;
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        margin-bottom: 0 !important;
+        transition: background 0.3s ease !important;
+    }
+
+    .locations-dropdown-toggle:active {
+        background: rgba(228, 211, 176, 0.2) !important;
+    }
+
+    .dropdown-arrow {
+        transition: transform 0.3s ease !important;
+        display: inline-block !important;
+    }
+
+    .locations-dropdown-toggle.open .dropdown-arrow {
+        transform: rotate(180deg) !important;
+    }
+
+    .contact-locations {
+        flex-direction: column !important;
+        gap: 20px !important;
+        margin-bottom: 25px !important;
+        display: none !important;
+        overflow: hidden !important;
+    }
+
+    .contact-locations.open {
+        display: flex !important;
+    }
+
+    .contact-details {
+        flex-direction: column !important;
+        gap: 20px !important;
+        margin-bottom: 25px !important;
+        margin-top: 15px !important;
+    }
+
+    /* Hide second phone number and catering email on mobile */
+    .contact-details .contact-item:nth-child(1) p:nth-of-type(2) {
+        display: none !important;
+    }
+
+    .contact-details .contact-item:nth-child(3) p:nth-of-type(2) {
+        display: none !important;
+    }
+
+    .contact-info {
+        text-align: center !important;
+    }
+
+    .contact-social {
+        text-align: center !important;
+        margin-top: 15px !important;
+        padding-top: 20px !important;
+    }
+
+    .contact-logo {
+        position: relative !important;
+        flex: none !important;
+    }
+
+    .contact-logo img {
+        max-width: 150px !important;
+    }
 }

@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initNavbarColorChange();
     initSectionFadeOverlay();
     initMobileMenu();
+    initLocationsDropdown();
 });
 
 /* ========================================
@@ -29,6 +30,7 @@ function initHeroScroll() {
     var heroOverlay = document.querySelector('.hero-overlay');
     var menuLeft = document.querySelector('.hero-menu-left');
     var menuRight = document.querySelector('.hero-menu-right');
+    var heroLogo = document.querySelector('.logo');
 
     if (!heroHeading || !heroVideo || !heroWrapper) return;
 
@@ -58,12 +60,13 @@ function initHeroScroll() {
         // Phase 1: Video shifts up (300px desktop, 215px tablet portrait, 150px mobile landscape)
         var isTabletPortrait = window.innerWidth >= 768 && window.innerWidth <= 990 && window.innerHeight > 500;
         var isMobileLandscape = window.innerHeight <= 500;
+        var isMobilePortrait = window.innerWidth <= 767 && window.innerHeight > 500;
 
-        var videoShiftAmount = isTabletPortrait ? 215 : (isMobileLandscape ? 150 : 300);
+        var videoShiftAmount = isMobilePortrait ? 160 : (isTabletPortrait ? 215 : (isMobileLandscape ? 150 : 300));
         var videoMoveUp = phase1Progress * videoShiftAmount;
 
         // Heading shifts up by default, but DOWN for mobile landscape
-        var headingShiftAmount = isMobileLandscape ? -30 : 30;
+        var headingShiftAmount = isMobilePortrait ? 20 : (isMobileLandscape ? -30 : 30);
         var headingMoveUp = phase1Progress * headingShiftAmount;
 
         // Video fades in from 0% to 100% over first 50px of shift
@@ -82,6 +85,11 @@ function initHeroScroll() {
         heroVideo.style.opacity = finalVideoOpacity;
         heroHeading.style.transform = 'translate(-50%, calc(-50% - ' + headingMoveUp + 'px))';
         heroHeading.style.opacity = finalHeadingOpacity;
+
+        // Fade out hero logo during Phase 2 on mobile portrait
+        if (isMobilePortrait && heroLogo) {
+            heroLogo.style.opacity = fadeOutOpacity;
+        }
 
         // Phase 3: Menu panels sweep in
         if (menuLeft && menuRight) {
@@ -146,6 +154,77 @@ function initHeroScroll() {
                 var sidesPosition = -50 + ((sidesCenter + 50) * easeSidesIn); // -50% to 25%
                 menuRight.style.left = sidesPosition + '%';
                 menuRight.style.right = 'auto';
+                menuRight.style.opacity = sidesInProgress;
+
+            } else if (isMobilePortrait) {
+                // MOBILE PORTRAIT: Sequential menu with vertical shift up
+                // Phase 3: Burgers sweep in from left to center
+                // Phase 4: Burgers hold at center
+                // Phase 5: Burgers shift UP out of view
+                // Phase 6: Sides sweep in from left to center
+                // Phase 7: Sides hold at center
+                // Phase 8: Sides shift UP
+
+                var holdDistance = 100;
+                var sweepDistance = viewportHeight;
+                var shiftUpDistance = viewportHeight * 1.5;
+
+                // Phase 3: Burgers sweep in (100vh to 200vh)
+                var burgersInStart = viewportHeight;
+                var burgersInEnd = burgersInStart + sweepDistance;
+                var burgersInProgress = scrollY > burgersInStart ? Math.min((scrollY - burgersInStart) / (burgersInEnd - burgersInStart), 1) : 0;
+
+                // Phase 4: Burgers hold
+                var burgersHoldStart = burgersInEnd;
+                var burgersHoldEnd = burgersHoldStart + holdDistance;
+
+                // Phase 5: Burgers shift UP
+                var burgersShiftStart = burgersHoldEnd;
+                var burgersShiftEnd = burgersShiftStart + shiftUpDistance;
+                var burgersShiftProgress = scrollY > burgersShiftStart ? Math.min((scrollY - burgersShiftStart) / (burgersShiftEnd - burgersShiftStart), 1) : 0;
+
+                // Sides start entering when burgers are 50% shifted up
+                var sidesInStart = burgersShiftStart + (shiftUpDistance * 0.5);
+                var sidesInEnd = sidesInStart + sweepDistance;
+                var sidesInProgress = scrollY > sidesInStart ? Math.min((scrollY - sidesInStart) / (sidesInEnd - sidesInStart), 1) : 0;
+
+                // Phase 7: Sides hold (shorter before exit)
+                var sidesHoldDistance = 50;
+                var sidesHoldStart = sidesInEnd;
+                var sidesHoldEnd = sidesHoldStart + sidesHoldDistance;
+
+                // Phase 8: Sides shift UP
+                var sidesShiftStart = sidesHoldEnd;
+                var sidesShiftEnd = sidesShiftStart + shiftUpDistance;
+                var sidesShiftProgress = scrollY > sidesShiftStart ? Math.min((scrollY - sidesShiftStart) / (sidesShiftEnd - sidesShiftStart), 1) : 0;
+
+                // Eased progress for burgers sweep, linear for sides and vertical shifts
+                var easeIn = 1 - Math.pow(1 - burgersInProgress, 3);
+
+                // Burgers horizontal position: -50% (off left) to center (0%)
+                var burgersCenter = 0;
+                var burgersPosition = -50 + ((burgersCenter + 50) * easeIn);
+                menuLeft.style.left = burgersPosition + '%';
+                menuLeft.style.right = 'auto';
+
+                // Burgers vertical position: linear shift up (1:1 with scroll)
+                var burgersVerticalShift = burgersShiftProgress * 180;
+                menuLeft.style.top = 'calc(60% + 100px - ' + burgersVerticalShift + '%)';
+
+                // Burgers opacity: fade in during sweep
+                menuLeft.style.opacity = burgersInProgress;
+
+                // Sides horizontal position: -50% (off left) to center (19%), linear
+                var sidesCenter = 19;
+                var sidesPosition = -50 + ((sidesCenter + 50) * sidesInProgress);
+                menuRight.style.left = sidesPosition + '%';
+                menuRight.style.right = 'auto';
+
+                // Sides vertical position: 150px higher than burgers base, linear shift up
+                var sidesVerticalShift = sidesShiftProgress * 180;
+                menuRight.style.top = 'calc(60% - 50px - ' + sidesVerticalShift + '%)';
+
+                // Sides opacity
                 menuRight.style.opacity = sidesInProgress;
 
             } else if (isMobileLandscape) {
@@ -243,8 +322,8 @@ function initHeroScroll() {
         // Overlay opacity: transition from 50% to 75% during menu animation
         if (heroOverlay) {
             var overlayProgress;
-            if (isTabletPortrait) {
-                // For tablet portrait, use burgers in progress
+            if (isTabletPortrait || isMobilePortrait) {
+                // For tablet/mobile portrait, use burgers in progress
                 var burgersInStart = viewportHeight;
                 var burgersInEnd = viewportHeight * 2;
                 overlayProgress = scrollY > burgersInStart ? Math.min((scrollY - burgersInStart) / (burgersInEnd - burgersInStart), 1) : 0;
@@ -320,6 +399,21 @@ function initMenuBuilder() {
     }
 
     updateToppingVideos();
+
+    // Mobile autoplay fix: browsers may throttle autoplay of multiple videos.
+    // Retry playing active videos on first user interaction (touch/click/scroll).
+    var retryPlayback = function() {
+        var activeVids = document.querySelectorAll('.topping-video.active');
+        activeVids.forEach(function(v) {
+            v.play().catch(function() {});
+        });
+        document.removeEventListener('touchstart', retryPlayback);
+        document.removeEventListener('click', retryPlayback);
+        document.removeEventListener('scroll', retryPlayback);
+    };
+    document.addEventListener('touchstart', retryPlayback, { passive: true });
+    document.addEventListener('click', retryPlayback);
+    document.addEventListener('scroll', retryPlayback, { passive: true });
 }
 
 function updateToppingVideos() {
@@ -448,6 +542,44 @@ function updateToppingVideos() {
     } else {
         // Rule 2: Default - only bottom bun
         bottomBunVideo.style.top = 'calc(50% - 60px)';    // 60px = 60px above center (toward patty)
+    }
+
+    // Mobile portrait: dynamically size container so expanded burger pushes content below
+    var isMobilePortrait = window.innerWidth <= 767 && window.innerHeight > 500;
+    if (isMobilePortrait) {
+        var container = document.querySelector('.video-stack-container');
+        if (container) {
+            var scale = 1.7;
+            var containerW = container.offsetWidth || (window.innerWidth - 10);
+            // Visual half-height of burger graphic: width * (1080/1920) * scale / 2
+            var videoVisualHalfH = containerW * 0.5625 * scale / 2;
+
+            // Collect offsets from center (50%) for all active videos
+            var activeVids = container.querySelectorAll('.topping-video.active');
+            var minOffset = 0, maxOffset = 0;
+
+            activeVids.forEach(function(v) {
+                var topStr = v.style.top || '50%';
+                var offset = 0;
+                if (topStr !== '50%') {
+                    var m = topStr.match(/calc\(50%\s*([+-])\s*(\d+)px\)/);
+                    if (m) {
+                        offset = (m[1] === '+' ? 1 : -1) * parseInt(m[2]);
+                    }
+                }
+                if (offset < minOffset) minOffset = offset;
+                if (offset > maxOffset) maxOffset = offset;
+            });
+
+            // Container height must fit the full visual extent of the burger
+            // Top constraint: H/2 + minOffset - halfVisualH >= 0
+            // Bottom constraint: H/2 + maxOffset + halfVisualH <= H
+            var h1 = 2 * (videoVisualHalfH - minOffset);
+            var h2 = 2 * (maxOffset + videoVisualHalfH);
+            var neededH = Math.ceil(Math.max(h1, h2));
+
+            container.style.setProperty('height', neededH + 'px', 'important');
+        }
     }
 }
 
@@ -654,6 +786,51 @@ function updateToppingImages() {
     } else {
         // Rule 2: Default - only bottom bun
         bottomBunImg.style.top = 'calc(50% - 60px)';    // 60px = 60px above center (toward patty)
+    }
+
+    // Mobile portrait: dynamically size container so expanded burger pushes content below
+    var isMobilePortrait = window.innerWidth <= 767 && window.innerHeight > 500;
+    if (isMobilePortrait) {
+        var container = document.querySelector('.image-stack-container');
+        if (container) {
+            var containerW = container.offsetWidth || (window.innerWidth - 10);
+            // Images are width:75% with object-fit:contain, so visual height is derived
+            // from the image width and its natural aspect ratio (not offsetHeight,
+            // which equals the container height due to CSS height:100%).
+            var activeImgs = container.querySelectorAll('.topping-image.active');
+            var imgVisualHalfH = 0;
+
+            if (activeImgs.length > 0) {
+                var sampleImg = activeImgs[0];
+                if (sampleImg.naturalWidth > 0) {
+                    var imgVisualH = containerW * 0.75 * (sampleImg.naturalHeight / sampleImg.naturalWidth);
+                    imgVisualHalfH = imgVisualH / 2;
+                }
+            }
+
+            // Collect offsets from center (50%) for all active images
+            var minOffset = 0, maxOffset = 0;
+
+            activeImgs.forEach(function(img) {
+                var topStr = img.style.top || '50%';
+                var offset = 0;
+                if (topStr !== '50%') {
+                    var m = topStr.match(/calc\(50%\s*([+-])\s*(\d+)px\)/);
+                    if (m) {
+                        offset = (m[1] === '+' ? 1 : -1) * parseInt(m[2]);
+                    }
+                }
+                if (offset < minOffset) minOffset = offset;
+                if (offset > maxOffset) maxOffset = offset;
+            });
+
+            // Container height must fit the full visual extent of the burger
+            var h1 = 2 * (imgVisualHalfH - minOffset);
+            var h2 = 2 * (maxOffset + imgVisualHalfH);
+            var neededH = Math.ceil(Math.max(h1, h2));
+
+            container.style.setProperty('height', neededH + 'px', 'important');
+        }
     }
 }
 
@@ -1071,11 +1248,15 @@ function initMobileMenu() {
             // Check viewport mode
             var isTabletPortrait = window.innerWidth <= 990 && window.innerWidth >= 768 && window.innerHeight > 500;
             var isMobileLandscape = window.innerHeight <= 500;
+            var isMobilePortrait = window.innerWidth <= 767 && window.innerHeight > 500;
 
             // Navigate
             switch(navType) {
                 case 'burgers':
-                    if (isMobileLandscape) {
+                    if (isMobilePortrait) {
+                        // Mobile portrait - same sequential timing as tablet portrait
+                        window.scrollTo({ top: viewportHeight * 2, behavior: 'instant' });
+                    } else if (isMobileLandscape) {
                         // Mobile landscape - burgers hold position
                         var holdDistance = 100;
                         var sweepDistance = viewportHeight * 0.8;
@@ -1089,7 +1270,19 @@ function initMobileMenu() {
                     break;
                 case 'sides':
                 case 'drinks':
-                    if (isMobileLandscape) {
+                    if (isMobilePortrait) {
+                        // Mobile portrait - upward exit timing
+                        var holdDistance = 100;
+                        var sweepDistance = viewportHeight;
+                        var shiftUpDistance = viewportHeight * 1.5;
+                        var burgersInEnd = viewportHeight + sweepDistance;
+                        var burgersHoldEnd = burgersInEnd + holdDistance;
+                        var burgersShiftStart = burgersHoldEnd;
+                        var sidesInStart = burgersShiftStart + (shiftUpDistance * 0.5);
+                        var sidesInEnd = sidesInStart + sweepDistance;
+                        var sidesHoldStart = sidesInEnd;
+                        window.scrollTo({ top: sidesHoldStart, behavior: 'instant' });
+                    } else if (isMobileLandscape) {
                         // Mobile landscape - sides appear after burgers fully exit
                         var holdDistance = 100;
                         var sweepDistance = viewportHeight * 0.8;
@@ -1122,5 +1315,21 @@ function initMobileMenu() {
                     break;
             }
         });
+    });
+}
+
+/* ========================================
+   LOCATIONS DROPDOWN (Mobile Portrait)
+   ======================================== */
+
+function initLocationsDropdown() {
+    var toggle = document.querySelector('.locations-dropdown-toggle');
+    var locations = document.querySelector('.contact-locations');
+
+    if (!toggle || !locations) return;
+
+    toggle.addEventListener('click', function() {
+        toggle.classList.toggle('open');
+        locations.classList.toggle('open');
     });
 }
