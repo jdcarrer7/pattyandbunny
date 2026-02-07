@@ -1298,6 +1298,18 @@ img {
     opacity: 1;
 }
 
+/* Z-index stacking for burger layers (Method 2) - top bun should be in front */
+.topping-image[data-topping-2="top_bun"] { z-index: 10; }
+.topping-image[data-topping-2="pickles"] { z-index: 9; }
+.topping-image[data-topping-2="onion"] { z-index: 8; }
+.topping-image[data-topping-2="bacon"] { z-index: 7; }
+.topping-image[data-topping-2="cheese"] { z-index: 6; }
+.topping-image[data-topping-2="patty"] { z-index: 5; }
+.topping-image[data-topping-2="pattyandcheese"] { z-index: 5; }
+.topping-image[data-topping-2="tomato"] { z-index: 4; }
+.topping-image[data-topping-2="lettuce"] { z-index: 3; }
+.topping-image[data-topping-2="bottom_bun"] { z-index: 2; }
+
 /* ========================================
    CONTACT SECTION
    ======================================== */

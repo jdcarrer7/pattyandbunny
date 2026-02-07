@@ -648,16 +648,27 @@ function initMenuBuilder2() {
 }
 
 function updateToppingImages() {
-    // Get checkbox states
-    var cheeseSelected = document.querySelector('.topping-item-2[data-topping-2="cheese"] input').checked;
-    var pattySelected = document.querySelector('.topping-item-2[data-topping-2="patty"] input').checked;
-    var topBunSelected = document.querySelector('.topping-item-2[data-topping-2="top_bun"] input').checked;
-    var bottomBunSelected = document.querySelector('.topping-item-2[data-topping-2="bottom_bun"] input').checked;
-    var picklesSelected = document.querySelector('.topping-item-2[data-topping-2="pickles"] input').checked;
-    var onionSelected = document.querySelector('.topping-item-2[data-topping-2="onion"] input').checked;
-    var baconSelected = document.querySelector('.topping-item-2[data-topping-2="bacon"] input').checked;
-    var tomatoSelected = document.querySelector('.topping-item-2[data-topping-2="tomato"] input').checked;
-    var lettuceSelected = document.querySelector('.topping-item-2[data-topping-2="lettuce"] input').checked;
+    // Get checkbox elements first with null checks
+    var topBunCheckbox = document.querySelector('.topping-item-2[data-topping-2="top_bun"] input');
+    var bottomBunCheckbox = document.querySelector('.topping-item-2[data-topping-2="bottom_bun"] input');
+    var pattyCheckbox = document.querySelector('.topping-item-2[data-topping-2="patty"] input');
+    var cheeseCheckbox = document.querySelector('.topping-item-2[data-topping-2="cheese"] input');
+    var picklesCheckbox = document.querySelector('.topping-item-2[data-topping-2="pickles"] input');
+    var onionCheckbox = document.querySelector('.topping-item-2[data-topping-2="onion"] input');
+    var baconCheckbox = document.querySelector('.topping-item-2[data-topping-2="bacon"] input');
+    var tomatoCheckbox = document.querySelector('.topping-item-2[data-topping-2="tomato"] input');
+    var lettuceCheckbox = document.querySelector('.topping-item-2[data-topping-2="lettuce"] input');
+
+    // Get checkbox states with null checks
+    var cheeseSelected = cheeseCheckbox ? cheeseCheckbox.checked : false;
+    var pattySelected = pattyCheckbox ? pattyCheckbox.checked : false;
+    var topBunSelected = topBunCheckbox ? topBunCheckbox.checked : false;
+    var bottomBunSelected = bottomBunCheckbox ? bottomBunCheckbox.checked : false;
+    var picklesSelected = picklesCheckbox ? picklesCheckbox.checked : false;
+    var onionSelected = onionCheckbox ? onionCheckbox.checked : false;
+    var baconSelected = baconCheckbox ? baconCheckbox.checked : false;
+    var tomatoSelected = tomatoCheckbox ? tomatoCheckbox.checked : false;
+    var lettuceSelected = lettuceCheckbox ? lettuceCheckbox.checked : false;
 
     // Get image elements
     var cheeseImg = document.querySelector('.topping-image[data-topping-2="cheese"]');
@@ -671,32 +682,38 @@ function updateToppingImages() {
     var tomatoImg = document.querySelector('.topping-image[data-topping-2="tomato"]');
     var lettuceImg = document.querySelector('.topping-image[data-topping-2="lettuce"]');
 
-    // Rule 1: Handle anchor (patty/cheese combo)
+    // Debug: Log if any elements are missing
+    if (!topBunImg) console.warn('Method 2: top_bun image not found');
+    if (!bottomBunImg) console.warn('Method 2: bottom_bun image not found');
+    if (!pattyImg) console.warn('Method 2: patty image not found');
+
+    // Rule 1: Handle anchor (patty/cheese combo) - with null checks
     if (cheeseSelected && pattySelected) {
-        cheeseImg.classList.remove('active');
-        pattyImg.classList.remove('active');
-        comboImg.classList.add('active');
+        if (cheeseImg) cheeseImg.classList.remove('active');
+        if (pattyImg) pattyImg.classList.remove('active');
+        if (comboImg) comboImg.classList.add('active');
     } else {
-        comboImg.classList.remove('active');
+        if (comboImg) comboImg.classList.remove('active');
         if (cheeseSelected) {
-            cheeseImg.classList.add('active');
+            if (cheeseImg) cheeseImg.classList.add('active');
         } else {
-            cheeseImg.classList.remove('active');
+            if (cheeseImg) cheeseImg.classList.remove('active');
         }
         if (pattySelected) {
-            pattyImg.classList.add('active');
+            if (pattyImg) pattyImg.classList.add('active');
         } else {
-            pattyImg.classList.remove('active');
+            if (pattyImg) pattyImg.classList.remove('active');
         }
     }
 
-    // Position anchor at center
-    comboImg.style.top = '50%';
-    pattyImg.style.top = '50%';
-    cheeseImg.style.top = '50%';
+    // Position anchor at center (with null checks)
+    if (comboImg) comboImg.style.top = '50%';
+    if (pattyImg) pattyImg.style.top = '50%';
+    if (cheeseImg) cheeseImg.style.top = '50%';
 
-    // Handle visibility for other toppings
+    // Handle visibility for other toppings (with null check)
     function setActive(img, isSelected) {
+        if (!img) return;
         if (isSelected) {
             img.classList.add('active');
         } else {
@@ -712,6 +729,13 @@ function updateToppingImages() {
     setActive(tomatoImg, tomatoSelected);
     setActive(lettuceImg, lettuceSelected);
 
+    // Debug: Log state after setting active
+    console.log('Method 2 burger state:', {
+        topBun: topBunSelected && topBunImg ? 'active' : 'inactive',
+        patty: pattySelected ? 'active' : 'inactive',
+        bottomBun: bottomBunSelected && bottomBunImg ? 'active' : 'inactive'
+    });
+
     // ========================================
     // ABOVE ANCHOR POSITIONING RULES (Method 2)
     // ========================================
@@ -726,40 +750,40 @@ function updateToppingImages() {
 
     if (baconSelected && onionSelected && picklesSelected) {
         // Rule 8: Bacon + Onion + Pickles + top bun
-        baconImg.style.top = 'calc(50% - 60px)';      // 60px above center
-        onionImg.style.top = 'calc(50% - 110px)';     // 110px above center
-        picklesImg.style.top = 'calc(50% - 140px)';   // 140px above center
-        topBunImg.style.top = 'calc(50% - 150px)';    // 150px above center
+        if (baconImg) baconImg.style.top = 'calc(50% - 60px)';
+        if (onionImg) onionImg.style.top = 'calc(50% - 110px)';
+        if (picklesImg) picklesImg.style.top = 'calc(50% - 140px)';
+        if (topBunImg) topBunImg.style.top = 'calc(50% - 150px)';
     } else if (baconSelected && onionSelected && !picklesSelected) {
         // Rule 6: Bacon + Onion (no pickles)
-        baconImg.style.top = 'calc(50% - 60px)';      // 60px above center
-        onionImg.style.top = 'calc(50% - 110px)';     // 110px above center
-        topBunImg.style.top = 'calc(50% - 75px)';     // 75px above center
+        if (baconImg) baconImg.style.top = 'calc(50% - 60px)';
+        if (onionImg) onionImg.style.top = 'calc(50% - 110px)';
+        if (topBunImg) topBunImg.style.top = 'calc(50% - 75px)';
     } else if (baconSelected && picklesSelected && !onionSelected) {
         // Rule 7: Bacon + Pickles (no onion)
-        baconImg.style.top = 'calc(50% - 60px)';      // 60px above center
-        picklesImg.style.top = 'calc(50% - 60px)';    // 60px above center
-        topBunImg.style.top = 'calc(50% - 75px)';     // 75px above center
+        if (baconImg) baconImg.style.top = 'calc(50% - 60px)';
+        if (picklesImg) picklesImg.style.top = 'calc(50% - 60px)';
+        if (topBunImg) topBunImg.style.top = 'calc(50% - 75px)';
     } else if (baconSelected && !onionSelected && !picklesSelected) {
         // Rule 5: Only bacon
-        baconImg.style.top = 'calc(50% - 60px)';      // 60px above center
-        topBunImg.style.top = '50%';                   // 0px = at center
+        if (baconImg) baconImg.style.top = 'calc(50% - 60px)';
+        if (topBunImg) topBunImg.style.top = '50%';
     } else if (onionSelected && picklesSelected && !baconSelected) {
         // Rule 9: Onion + Pickles (no bacon)
-        onionImg.style.top = 'calc(50% - 30px)';      // 30px above center
-        picklesImg.style.top = 'calc(50% - 70px)';    // 70px above center
-        topBunImg.style.top = 'calc(50% - 90px)';     // 90px above center
+        if (onionImg) onionImg.style.top = 'calc(50% - 30px)';
+        if (picklesImg) picklesImg.style.top = 'calc(50% - 70px)';
+        if (topBunImg) topBunImg.style.top = 'calc(50% - 90px)';
     } else if (onionSelected && !picklesSelected && !baconSelected) {
         // Rule 4: Only onions
-        onionImg.style.top = 'calc(50% - 30px)';      // 30px above center
-        topBunImg.style.top = '50%';                   // 0px = at center
+        if (onionImg) onionImg.style.top = 'calc(50% - 30px)';
+        if (topBunImg) topBunImg.style.top = '50%';
     } else if (picklesSelected && !onionSelected && !baconSelected) {
         // Rule 3: Only pickles
-        picklesImg.style.top = 'calc(50% + 15px)';    // -15px = 15px below center
-        topBunImg.style.top = '50%';                   // 0px = at center
+        if (picklesImg) picklesImg.style.top = 'calc(50% + 15px)';
+        if (topBunImg) topBunImg.style.top = '50%';
     } else {
         // Rule 2: Default - only top bun
-        topBunImg.style.top = 'calc(50% + 60px)';     // -60px = 60px below center
+        if (topBunImg) topBunImg.style.top = 'calc(50% + 60px)';
     }
 
     // ========================================
@@ -772,20 +796,20 @@ function updateToppingImages() {
 
     if (tomatoSelected && lettuceSelected) {
         // Rule 11: Tomatoes + Lettuce + bottom bun
-        tomatoImg.style.top = 'calc(50% + 35px)';       // -35px = 35px below center
-        lettuceImg.style.top = 'calc(50% + 115px)';     // -115px = 115px below center
-        bottomBunImg.style.top = 'calc(50% + 160px)';   // -160px = 160px below center
+        if (tomatoImg) tomatoImg.style.top = 'calc(50% + 35px)';
+        if (lettuceImg) lettuceImg.style.top = 'calc(50% + 115px)';
+        if (bottomBunImg) bottomBunImg.style.top = 'calc(50% + 160px)';
     } else if (lettuceSelected && !tomatoSelected) {
         // Rule 10: Lettuce + bottom bun only
-        lettuceImg.style.top = 'calc(50% + 15px)';      // -15px = 15px below center
-        bottomBunImg.style.top = 'calc(50% + 50px)';    // -50px = 50px below center
+        if (lettuceImg) lettuceImg.style.top = 'calc(50% + 15px)';
+        if (bottomBunImg) bottomBunImg.style.top = 'calc(50% + 50px)';
     } else if (tomatoSelected && !lettuceSelected) {
         // Tomatoes + bottom bun only (no lettuce)
-        tomatoImg.style.top = 'calc(50% + 35px)';       // -35px = 35px below center
-        bottomBunImg.style.top = '50%';                  // 0px = at center
+        if (tomatoImg) tomatoImg.style.top = 'calc(50% + 35px)';
+        if (bottomBunImg) bottomBunImg.style.top = '50%';
     } else {
         // Rule 2: Default - only bottom bun
-        bottomBunImg.style.top = 'calc(50% - 60px)';    // 60px = 60px above center (toward patty)
+        if (bottomBunImg) bottomBunImg.style.top = 'calc(50% - 60px)';
     }
 
     // Mobile portrait: dynamically size container so expanded burger pushes content below
