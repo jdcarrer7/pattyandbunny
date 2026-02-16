@@ -645,6 +645,16 @@ function initMenuBuilder2() {
     }
 
     updateToppingImages();
+
+    // Recalculate sizing once burger images load (needed for correct mobile sizing on first load)
+    var toppingImgs = document.querySelectorAll('.image-stack-container .topping-image');
+    toppingImgs.forEach(function(img) {
+        if (!img.complete) {
+            img.addEventListener('load', function() {
+                updateToppingImages();
+            }, { once: true });
+        }
+    });
 }
 
 function updateToppingImages() {
@@ -853,7 +863,10 @@ function updateToppingImages() {
             var h2 = 2 * (maxOffset + imgVisualHalfH);
             var neededH = Math.ceil(Math.max(h1, h2));
 
-            container.style.setProperty('height', neededH + 'px', 'important');
+            // Only override CSS height if images are loaded (imgVisualHalfH > 0)
+            if (imgVisualHalfH > 0) {
+                container.style.setProperty('height', neededH + 'px', 'important');
+            }
         }
     }
 }
